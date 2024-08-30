@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	switchbot2 "github.com/nasa9084/go-switchbot/v3/switchbot"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +12,6 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/nasa9084/go-switchbot/v3"
 )
 
 // https://github.com/OpenWonderLabs/SwitchBotAPI/blob/7a68353d84d07d439a11cb5503b634f24302f733/README.md#get-all-devices
@@ -46,7 +46,7 @@ func TestDevices(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+	c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 	devices, infrared, err := c.Device().List(context.Background())
 	if err != nil {
 		t.Fatal(err)
@@ -60,10 +60,10 @@ func TestDevices(t *testing.T) {
 
 		got := devices[0]
 
-		want := switchbot.Device{
+		want := switchbot2.Device{
 			ID:                   "500291B269BE",
 			Name:                 "Living Room Humidifier",
-			Type:                 switchbot.Humidifier,
+			Type:                 switchbot2.Humidifier,
 			IsEnableCloudService: true,
 			Hub:                  "000000000000",
 		}
@@ -81,10 +81,10 @@ func TestDevices(t *testing.T) {
 
 		got := infrared[0]
 
-		want := switchbot.InfraredDevice{
+		want := switchbot2.InfraredDevice{
 			ID:   "02-202008110034-13",
 			Name: "Living Room TV",
-			Type: switchbot.TV,
+			Type: switchbot2.TV,
 			Hub:  "FA7310762361",
 		}
 
@@ -119,21 +119,21 @@ func TestDeviceStatus(t *testing.T) {
 		)
 		defer srv.Close()
 
-		c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+		c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 		got, err := c.Device().Status(context.Background(), "C271111EC0AB")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		want := switchbot.DeviceStatus{
+		want := switchbot2.DeviceStatus{
 			ID:          "C271111EC0AB",
-			Type:        switchbot.Meter,
+			Type:        switchbot2.Meter,
 			Hub:         "FA7310762361",
 			Humidity:    52,
 			Temperature: 26.1,
 		}
 
-		if diff := cmp.Diff(want, got, cmp.AllowUnexported(switchbot.BrightnessState{})); diff != "" {
+		if diff := cmp.Diff(want, got, cmp.AllowUnexported(switchbot2.BrightnessState{})); diff != "" {
 			t.Fatalf("status mismatch (-want +got):\n%s", diff)
 		}
 	})
@@ -164,15 +164,15 @@ func TestDeviceStatus(t *testing.T) {
 		)
 		defer srv.Close()
 
-		c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+		c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 		got, err := c.Device().Status(context.Background(), "E2F6032048AB")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		want := switchbot.DeviceStatus{
+		want := switchbot2.DeviceStatus{
 			ID:            "E2F6032048AB",
-			Type:          switchbot.Curtain,
+			Type:          switchbot2.Curtain,
 			Hub:           "FA7310762361",
 			IsCalibrated:  true,
 			IsGrouped:     false,
@@ -180,7 +180,7 @@ func TestDeviceStatus(t *testing.T) {
 			SlidePosition: 0,
 		}
 
-		if diff := cmp.Diff(want, got, cmp.AllowUnexported(switchbot.BrightnessState{})); diff != "" {
+		if diff := cmp.Diff(want, got, cmp.AllowUnexported(switchbot2.BrightnessState{})); diff != "" {
 			t.Fatalf("status mismatch (-want +got):\n%s", diff)
 		}
 	})
@@ -203,7 +203,7 @@ func TestDeviceStatusBrightness(t *testing.T) {
 		IntValue int
 		IntErr   error
 
-		AmbientValue switchbot.AmbientBrightness
+		AmbientValue switchbot2.AmbientBrightness
 		AmbientErr   error
 	}
 	tests := []struct {
@@ -226,7 +226,7 @@ func TestDeviceStatusBrightness(t *testing.T) {
 				IntValue: -1,
 				IntErr:   errors.New("integer brightness value is only available for color bulb devices"),
 
-				AmbientValue: switchbot.AmbientBrightnessBright,
+				AmbientValue: switchbot2.AmbientBrightnessBright,
 			},
 		},
 		{
@@ -236,7 +236,7 @@ func TestDeviceStatusBrightness(t *testing.T) {
 				IntValue: -1,
 				IntErr:   errors.New("integer brightness value is only available for color bulb devices"),
 
-				AmbientValue: switchbot.AmbientBrightnessDim,
+				AmbientValue: switchbot2.AmbientBrightnessDim,
 			},
 		},
 	}
@@ -255,7 +255,7 @@ func TestDeviceStatusBrightness(t *testing.T) {
 			)
 			defer srv.Close()
 
-			c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+			c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 			got, err := c.Device().Status(context.Background(), "E2F6032048AB")
 			if err != nil {
 				t.Fatal(err)
@@ -310,9 +310,9 @@ func TestDeviceCommand(t *testing.T) {
 		))
 		defer srv.Close()
 
-		c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+		c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
-		cmd, err := switchbot.CreateKeyCommand("Guest Code", switchbot.TimeLimitPasscode, "12345678", time.Date(2022, time.October, 1, 16, 00, 56, 0, time.UTC), time.Date(2022, time.October, 9, 16, 3, 52, 0, time.UTC))
+		cmd, err := switchbot2.CreateKeyCommand("Guest Code", switchbot2.TimeLimitPasscode, "12345678", time.Date(2022, time.October, 1, 16, 00, 56, 0, time.UTC), time.Date(2022, time.October, 9, 16, 3, 52, 0, time.UTC))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -330,9 +330,9 @@ func TestDeviceCommand(t *testing.T) {
 		))
 		defer srv.Close()
 
-		c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+		c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
-		if err := c.Device().Command(context.Background(), "210", switchbot.TurnOnCommand()); err != nil {
+		if err := c.Device().Command(context.Background(), "210", switchbot2.TurnOnCommand()); err != nil {
 			t.Fatal(err)
 		}
 	})
@@ -346,9 +346,9 @@ func TestDeviceCommand(t *testing.T) {
 		))
 		defer srv.Close()
 
-		c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+		c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
-		if err := c.Device().Command(context.Background(), "84F70353A411", switchbot.SetColorCommand(122, 80, 20)); err != nil {
+		if err := c.Device().Command(context.Background(), "84F70353A411", switchbot2.SetColorCommand(122, 80, 20)); err != nil {
 			t.Fatal(err)
 		}
 	})
@@ -362,9 +362,9 @@ func TestDeviceCommand(t *testing.T) {
 		))
 		defer srv.Close()
 
-		c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+		c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
-		if err := c.Device().Command(context.Background(), "02-202007201626-70", switchbot.ACSetAllCommand(26, switchbot.ACAuto, switchbot.ACMedium, switchbot.PowerOn)); err != nil {
+		if err := c.Device().Command(context.Background(), "02-202007201626-70", switchbot2.ACSetAllCommand(26, switchbot2.ACAuto, switchbot2.ACMedium, switchbot2.PowerOn)); err != nil {
 			t.Fatal(err)
 		}
 	})
@@ -378,9 +378,9 @@ func TestDeviceCommand(t *testing.T) {
 		))
 		defer srv.Close()
 
-		c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+		c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
-		if err := c.Device().Command(context.Background(), "02-202007201626-10", switchbot.ButtonPushCommand("ボタン")); err != nil {
+		if err := c.Device().Command(context.Background(), "02-202007201626-10", switchbot2.ButtonPushCommand("ボタン")); err != nil {
 			t.Fatal(err)
 		}
 	})

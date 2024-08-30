@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	switchbot2 "github.com/nasa9084/go-switchbot/v3/switchbot"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/nasa9084/go-switchbot/v3"
 )
 
 func TestWebhookSetup(t *testing.T) {
@@ -39,7 +39,7 @@ func TestWebhookSetup(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+	c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
 	if err := c.Webhook().Setup(context.Background(), "url1", "ALL"); err != nil {
 		t.Fatal(err)
@@ -73,9 +73,9 @@ func TestWebhookQuery(t *testing.T) {
 		)
 		defer srv.Close()
 
-		c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+		c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
-		if err := c.Webhook().Query(context.Background(), switchbot.QueryURL, ""); err != nil {
+		if err := c.Webhook().Query(context.Background(), switchbot2.QueryURL, ""); err != nil {
 			t.Fatal(err)
 		}
 	})
@@ -106,9 +106,9 @@ func TestWebhookQuery(t *testing.T) {
 		)
 		defer srv.Close()
 
-		c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+		c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
-		if err := c.Webhook().Query(context.Background(), switchbot.QueryDetails, "url1"); err != nil {
+		if err := c.Webhook().Query(context.Background(), switchbot2.QueryDetails, "url1"); err != nil {
 			t.Fatal(err)
 		}
 	})
@@ -143,7 +143,7 @@ func TestWebhookUpdate(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+	c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
 	if err := c.Webhook().Update(context.Background(), "url1", true); err != nil {
 		t.Fatal(err)
@@ -176,7 +176,7 @@ func TestWebhookDelete(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+	c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
 	if err := c.Webhook().Delete(context.Background(), "url1"); err != nil {
 		t.Fatal(err)
@@ -191,16 +191,16 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("motion sensor", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.MotionSensorEvent); ok {
-					want := switchbot.MotionSensorEvent{
+				if got, ok := event.(*switchbot2.MotionSensorEvent); ok {
+					want := switchbot2.MotionSensorEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.MotionSensorEventContext{
+						Context: switchbot2.MotionSensorEventContext{
 							DeviceType:     "WoPresence",
 							DeviceMac:      "01:00:5e:90:10:00",
 							DetectionState: "NOT_DETECTED",
@@ -224,21 +224,21 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("contact sensor", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.ContactSensorEvent); ok {
-					want := switchbot.ContactSensorEvent{
+				if got, ok := event.(*switchbot2.ContactSensorEvent); ok {
+					want := switchbot2.ContactSensorEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.ContactSensorEventContext{
+						Context: switchbot2.ContactSensorEventContext{
 							DeviceType:     "WoContact",
 							DeviceMac:      "01:00:5e:90:10:00",
 							DetectionState: "NOT_DETECTED",
 							DoorMode:       "OUT_DOOR",
-							Brightness:     switchbot.AmbientBrightnessDim,
+							Brightness:     switchbot2.AmbientBrightnessDim,
 							OpenState:      "open",
 							TimeOfSample:   123456789,
 						},
@@ -260,16 +260,16 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("meter", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.MeterEvent); ok {
-					want := switchbot.MeterEvent{
+				if got, ok := event.(*switchbot2.MeterEvent); ok {
+					want := switchbot2.MeterEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.MeterEventContext{
+						Context: switchbot2.MeterEventContext{
 							DeviceType:   "WoMeter",
 							DeviceMac:    "01:00:5e:90:10:00",
 							Temperature:  22.5,
@@ -295,16 +295,16 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("meter plus", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.MeterPlusEvent); ok {
-					want := switchbot.MeterPlusEvent{
+				if got, ok := event.(*switchbot2.MeterPlusEvent); ok {
+					want := switchbot2.MeterPlusEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.MeterPlusEventContext{
+						Context: switchbot2.MeterPlusEventContext{
 							DeviceType:   "WoMeterPlus",
 							DeviceMac:    "01:00:5e:90:10:00",
 							Temperature:  22.5,
@@ -332,16 +332,16 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("lock", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.LockEvent); ok {
-					want := switchbot.LockEvent{
+				if got, ok := event.(*switchbot2.LockEvent); ok {
+					want := switchbot2.LockEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.LockEventContext{
+						Context: switchbot2.LockEventContext{
 							DeviceType:   "WoLock",
 							DeviceMac:    "01:00:5e:90:10:00",
 							LockState:    "LOCKED",
@@ -365,16 +365,16 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("indoor cam", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.IndoorCamEvent); ok {
-					want := switchbot.IndoorCamEvent{
+				if got, ok := event.(*switchbot2.IndoorCamEvent); ok {
+					want := switchbot2.IndoorCamEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.IndoorCamEventContext{
+						Context: switchbot2.IndoorCamEventContext{
 							DeviceType:     "WoCamera",
 							DeviceMac:      "01:00:5e:90:10:00",
 							DetectionState: "DETECTED",
@@ -398,16 +398,16 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("pan/tilt cam", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.PanTiltCamEvent); ok {
-					want := switchbot.PanTiltCamEvent{
+				if got, ok := event.(*switchbot2.PanTiltCamEvent); ok {
+					want := switchbot2.PanTiltCamEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.PanTiltCamEventContext{
+						Context: switchbot2.PanTiltCamEventContext{
 							DeviceType:     "WoPanTiltCam",
 							DeviceMac:      "01:00:5e:90:10:00",
 							DetectionState: "DETECTED",
@@ -431,19 +431,19 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("color bulb", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.ColorBulbEvent); ok {
-					want := switchbot.ColorBulbEvent{
+				if got, ok := event.(*switchbot2.ColorBulbEvent); ok {
+					want := switchbot2.ColorBulbEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.ColorBulbEventContext{
+						Context: switchbot2.ColorBulbEventContext{
 							DeviceType:       "WoBulb",
 							DeviceMac:        "01:00:5e:90:10:00",
-							PowerState:       switchbot.PowerOn,
+							PowerState:       switchbot2.PowerOn,
 							Brightness:       10,
 							Color:            "255:245:235",
 							ColorTemperature: 3500,
@@ -467,19 +467,19 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("led strip light", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.StripLightEvent); ok {
-					want := switchbot.StripLightEvent{
+				if got, ok := event.(*switchbot2.StripLightEvent); ok {
+					want := switchbot2.StripLightEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.StripLightEventContext{
+						Context: switchbot2.StripLightEventContext{
 							DeviceType:   "WoStrip",
 							DeviceMac:    "01:00:5e:90:10:00",
-							PowerState:   switchbot.PowerOn,
+							PowerState:   switchbot2.PowerOn,
 							Brightness:   10,
 							Color:        "255:245:235",
 							TimeOfSample: 123456789,
@@ -502,19 +502,19 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("plug mini (US)", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.PlugMiniUSEvent); ok {
-					want := switchbot.PlugMiniUSEvent{
+				if got, ok := event.(*switchbot2.PlugMiniUSEvent); ok {
+					want := switchbot2.PlugMiniUSEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.PlugMiniUSEventContext{
+						Context: switchbot2.PlugMiniUSEventContext{
 							DeviceType:   "WoPlugUS",
 							DeviceMac:    "01:00:5e:90:10:00",
-							PowerState:   switchbot.PowerOn,
+							PowerState:   switchbot2.PowerOn,
 							TimeOfSample: 123456789,
 						},
 					}
@@ -535,19 +535,19 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("plug mini (JP)", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.PlugMiniJPEvent); ok {
-					want := switchbot.PlugMiniJPEvent{
+				if got, ok := event.(*switchbot2.PlugMiniJPEvent); ok {
+					want := switchbot2.PlugMiniJPEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.PlugMiniJPEventContext{
+						Context: switchbot2.PlugMiniJPEventContext{
 							DeviceType:   "WoPlugJP",
 							DeviceMac:    "01:00:5e:90:10:00",
-							PowerState:   switchbot.PowerOn,
+							PowerState:   switchbot2.PowerOn,
 							TimeOfSample: 123456789,
 						},
 					}
@@ -568,20 +568,20 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("Robot Vacuum Cleaner S1", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.SweeperEvent); ok {
-					want := switchbot.SweeperEvent{
+				if got, ok := event.(*switchbot2.SweeperEvent); ok {
+					want := switchbot2.SweeperEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.SweeperEventContext{
+						Context: switchbot2.SweeperEventContext{
 							DeviceType:    "WoSweeper",
 							DeviceMac:     "01:00:5e:90:10:00",
-							WorkingStatus: switchbot.CleanerStandBy,
-							OnlineStatus:  switchbot.CleanerOnline,
+							WorkingStatus: switchbot2.CleanerStandBy,
+							OnlineStatus:  switchbot2.CleanerOnline,
 							Battery:       100,
 							TimeOfSample:  123456789,
 						},
@@ -603,20 +603,20 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("Robot Vacuum Cleaner S1 Plus", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.SweeperEvent); ok {
-					want := switchbot.SweeperEvent{
+				if got, ok := event.(*switchbot2.SweeperEvent); ok {
+					want := switchbot2.SweeperEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.SweeperEventContext{
+						Context: switchbot2.SweeperEventContext{
 							DeviceType:    "WoSweeperPlus",
 							DeviceMac:     "01:00:5e:90:10:00",
-							WorkingStatus: switchbot.CleanerStandBy,
-							OnlineStatus:  switchbot.CleanerOnline,
+							WorkingStatus: switchbot2.CleanerStandBy,
+							OnlineStatus:  switchbot2.CleanerOnline,
 							Battery:       100,
 							TimeOfSample:  123456789,
 						},
@@ -638,19 +638,19 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("Ceiling Light", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.CeilingEvent); ok {
-					want := switchbot.CeilingEvent{
+				if got, ok := event.(*switchbot2.CeilingEvent); ok {
+					want := switchbot2.CeilingEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.CeilingEventContext{
+						Context: switchbot2.CeilingEventContext{
 							DeviceType:       "WoCeiling",
 							DeviceMac:        "01:00:5e:90:10:00",
-							PowerState:       switchbot.PowerOn,
+							PowerState:       switchbot2.PowerOn,
 							Brightness:       10,
 							ColorTemperature: 3500,
 							TimeOfSample:     123456789,
@@ -673,19 +673,19 @@ func TestParseWebhook(t *testing.T) {
 	t.Run("Ceiling Light Pro", func(t *testing.T) {
 		srv := httptest.NewServer(
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				event, err := switchbot.ParseWebhookRequest(r)
+				event, err := switchbot2.ParseWebhookRequest(r)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if got, ok := event.(*switchbot.CeilingEvent); ok {
-					want := switchbot.CeilingEvent{
+				if got, ok := event.(*switchbot2.CeilingEvent); ok {
+					want := switchbot2.CeilingEvent{
 						EventType:    "changeReport",
 						EventVersion: "1",
-						Context: switchbot.CeilingEventContext{
+						Context: switchbot2.CeilingEventContext{
 							DeviceType:       "WoCeilingPro",
 							DeviceMac:        "01:00:5e:90:10:00",
-							PowerState:       switchbot.PowerOn,
+							PowerState:       switchbot2.PowerOn,
 							Brightness:       10,
 							ColorTemperature: 3500,
 							TimeOfSample:     123456789,
@@ -709,16 +709,16 @@ func TestParseWebhook(t *testing.T) {
 		t.Run("create a passcode", func(t *testing.T) {
 			srv := httptest.NewServer(
 				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					event, err := switchbot.ParseWebhookRequest(r)
+					event, err := switchbot2.ParseWebhookRequest(r)
 					if err != nil {
 						t.Fatal(err)
 					}
 
-					if got, ok := event.(*switchbot.KeypadEvent); ok {
-						want := switchbot.KeypadEvent{
+					if got, ok := event.(*switchbot2.KeypadEvent); ok {
+						want := switchbot2.KeypadEvent{
 							EventType:    "changeReport",
 							EventVersion: "1",
-							Context: switchbot.KeypadEventContext{
+							Context: switchbot2.KeypadEventContext{
 								DeviceType:   "WoKeypad",
 								DeviceMac:    "01:00:5e:90:10:00",
 								EventName:    "createKey",
@@ -743,16 +743,16 @@ func TestParseWebhook(t *testing.T) {
 		t.Run("delete a passcode", func(t *testing.T) {
 			srv := httptest.NewServer(
 				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					event, err := switchbot.ParseWebhookRequest(r)
+					event, err := switchbot2.ParseWebhookRequest(r)
 					if err != nil {
 						t.Fatal(err)
 					}
 
-					if got, ok := event.(*switchbot.KeypadEvent); ok {
-						want := switchbot.KeypadEvent{
+					if got, ok := event.(*switchbot2.KeypadEvent); ok {
+						want := switchbot2.KeypadEvent{
 							EventType:    "changeReport",
 							EventVersion: "1",
-							Context: switchbot.KeypadEventContext{
+							Context: switchbot2.KeypadEventContext{
 								DeviceType:   "WoKeypad",
 								DeviceMac:    "01:00:5e:90:10:00",
 								EventName:    "deleteKey",
@@ -780,16 +780,16 @@ func TestParseWebhook(t *testing.T) {
 		t.Run("create a passcode", func(t *testing.T) {
 			srv := httptest.NewServer(
 				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					event, err := switchbot.ParseWebhookRequest(r)
+					event, err := switchbot2.ParseWebhookRequest(r)
 					if err != nil {
 						t.Fatal(err)
 					}
 
-					if got, ok := event.(*switchbot.KeypadEvent); ok {
-						want := switchbot.KeypadEvent{
+					if got, ok := event.(*switchbot2.KeypadEvent); ok {
+						want := switchbot2.KeypadEvent{
 							EventType:    "changeReport",
 							EventVersion: "1",
-							Context: switchbot.KeypadEventContext{
+							Context: switchbot2.KeypadEventContext{
 								DeviceType:   "WoKeypadTouch",
 								DeviceMac:    "01:00:5e:90:10:00",
 								EventName:    "createKey",
@@ -814,16 +814,16 @@ func TestParseWebhook(t *testing.T) {
 		t.Run("delete a passcode", func(t *testing.T) {
 			srv := httptest.NewServer(
 				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					event, err := switchbot.ParseWebhookRequest(r)
+					event, err := switchbot2.ParseWebhookRequest(r)
 					if err != nil {
 						t.Fatal(err)
 					}
 
-					if got, ok := event.(*switchbot.KeypadEvent); ok {
-						want := switchbot.KeypadEvent{
+					if got, ok := event.(*switchbot2.KeypadEvent); ok {
+						want := switchbot2.KeypadEvent{
 							EventType:    "changeReport",
 							EventVersion: "1",
-							Context: switchbot.KeypadEventContext{
+							Context: switchbot2.KeypadEventContext{
 								DeviceType:   "WoKeypadTouch",
 								DeviceMac:    "01:00:5e:90:10:00",
 								EventName:    "deleteKey",

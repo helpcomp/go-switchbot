@@ -1,9 +1,8 @@
 package switchbot_test
 
 import (
+	"github.com/nasa9084/go-switchbot/v3/switchbot"
 	"testing"
-
-	"github.com/nasa9084/go-switchbot/v3"
 )
 
 func TestDeviceVersion(t *testing.T) {

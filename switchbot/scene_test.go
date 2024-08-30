@@ -2,12 +2,12 @@ package switchbot_test
 
 import (
 	"context"
+	switchbot2 "github.com/nasa9084/go-switchbot/v3/switchbot"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/nasa9084/go-switchbot/v3"
 )
 
 // https://github.com/OpenWonderLabs/SwitchBotAPI/blob/7a68353d84d07d439a11cb5503b634f24302f733/README.md#get-all-scenes
@@ -45,7 +45,7 @@ func TestScenes(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+	c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 
 	got, err := c.Scene().List(context.Background())
 	if err != nil {
@@ -104,7 +104,7 @@ func TestSceneExecute(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c := switchbot.New("", "", switchbot.WithEndpoint(srv.URL))
+	c := switchbot2.New("", "", switchbot2.WithEndpoint(srv.URL))
 	if err := c.Scene().Execute(context.Background(), "T02-202009221414-48924101"); err != nil {
 		t.Fatal(err)
 	}

@@ -3,8 +3,7 @@ package switchbot_test
 import (
 	"context"
 	"fmt"
-
-	"github.com/nasa9084/go-switchbot/v3"
+	"github.com/nasa9084/go-switchbot/v3/switchbot"
 )
 
 func ExamplePrintPhysicalDevices() {
